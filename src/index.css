@@ -1,0 +1,176 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* NASA Space Theme Design System - All colors in HSL */
+
+@layer base {
+  :root {
+    /* Deep space background palette */
+    --background: 240 15% 8%;
+    --foreground: 200 20% 95%;
+
+    /* Glass-morphic card system */
+    --card: 240 15% 12%;
+    --card-foreground: 200 20% 95%;
+
+    /* Overlay panels */
+    --popover: 240 20% 10%;
+    --popover-foreground: 200 20% 95%;
+
+    /* NASA blue primary */
+    --primary: 220 100% 60%;
+    --primary-foreground: 240 15% 8%;
+
+    /* Atmospheric glow secondary */
+    --secondary: 200 80% 45%;
+    --secondary-foreground: 240 15% 8%;
+
+    /* Muted space tones */
+    --muted: 240 10% 20%;
+    --muted-foreground: 200 10% 65%;
+
+    /* Cyan accent for highlights */
+    --accent: 180 100% 70%;
+    --accent-foreground: 240 15% 8%;
+
+    /* Orange for hazardous asteroids */
+    --destructive: 15 100% 60%;
+    --destructive-foreground: 240 15% 8%;
+
+    /* Subtle borders and inputs */
+    --border: 240 15% 25%;
+    --input: 240 15% 15%;
+    --ring: 180 100% 70%;
+
+    /* Rounded corners */
+    --radius: 0.75rem;
+
+    /* Custom space theme colors */
+    --asteroid-safe: 120 60% 50%;
+    --asteroid-hazardous: 15 100% 60%;
+    --earth-glow: 200 80% 45%;
+    --space-gradient-start: 240 20% 5%;
+    --space-gradient-end: 260 30% 15%;
+    
+    /* Atmospheric effects */
+    --atmosphere-inner: 200 80% 60%;
+    --atmosphere-outer: 180 60% 40%;
+    
+    /* UI Glass effects */
+    --glass-bg: 240 15% 12%;
+    --glass-border: 180 40% 30%;
+    --glass-shadow: 240 50% 3%;
+
+    /* Animation timings */
+    --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  /* Dark theme is our default space theme */
+  .dark {
+    /* Same as root - we live in space! */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground overflow-hidden;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  /* Custom scrollbars for space theme */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-accent rounded-full;
+  }
+}
+
+@layer components {
+  /* Glass morphism panel */
+  .glass-panel {
+    background: hsla(var(--glass-bg) / 0.8);
+    border: 1px solid hsla(var(--glass-border) / 0.3);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px hsla(var(--glass-shadow) / 0.3);
+  }
+
+  /* Orbital glow effect */
+  .orbital-glow {
+    box-shadow: 
+      0 0 20px hsla(var(--accent) / 0.4),
+      0 0 40px hsla(var(--accent) / 0.2),
+      inset 0 0 20px hsla(var(--accent) / 0.1);
+  }
+
+  /* Asteroid hover effect */
+  .asteroid-hover {
+    transition: all var(--transition-fast);
+    cursor: pointer;
+  }
+
+  .asteroid-hover:hover {
+    transform: scale(1.1);
+    filter: brightness(1.3);
+  }
+
+  /* Smooth space transitions */
+  .space-transition {
+    transition: all var(--transition-smooth);
+  }
+
+  /* Pulsing animation for hazardous elements */
+  .pulse-danger {
+    animation: pulse-danger 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse-danger {
+    0%, 100% {
+      box-shadow: 0 0 0 0 hsla(var(--destructive) / 0.7);
+    }
+    70% {
+      box-shadow: 0 0 0 10px hsla(var(--destructive) / 0);
+    }
+  }
+
+  /* Starfield background */
+  .starfield {
+    background: 
+      radial-gradient(2px 2px at 20px 30px, hsla(var(--foreground) / 0.8), transparent),
+      radial-gradient(2px 2px at 40px 70px, hsla(var(--accent) / 0.6), transparent),
+      radial-gradient(1px 1px at 90px 40px, hsla(var(--foreground) / 0.9), transparent),
+      radial-gradient(1px 1px at 130px 80px, hsla(var(--primary) / 0.7), transparent),
+      radial-gradient(2px 2px at 160px 30px, hsla(var(--foreground) / 0.8), transparent),
+      linear-gradient(135deg, hsl(var(--space-gradient-start)), hsl(var(--space-gradient-end)));
+    background-repeat: repeat;
+    background-size: 200px 100px;
+  }
+}
