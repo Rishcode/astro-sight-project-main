@@ -83,7 +83,6 @@ class NasaApiService {
   private async makeRequest<T>(endpoint: string, params: Record<string, string> = {}): Promise<T> {
     const url = new URL(`${NASA_BASE_URL}${endpoint}`);
     
-    // Add API key and other parameters
     url.searchParams.append('api_key', NASA_API_KEY);
     Object.entries(params).forEach(([key, value]) => {
       url.searchParams.append(key, value);
@@ -103,9 +102,6 @@ class NasaApiService {
     }
   }
 
-  /**
-   * Get asteroid feed data for a specific date range
-   */
   async getAsteroidFeed(startDate?: string, endDate?: string): Promise<NeoFeedResponse> {
     const params: Record<string, string> = {};
     
@@ -115,9 +111,6 @@ class NasaApiService {
     return this.makeRequest<NeoFeedResponse>('/feed', params);
   }
 
-  /**
-   * Browse all known Near Earth Objects
-   */
   async browseAsteroids(page = 0, size = 20): Promise<NeoBrowseResponse> {
     return this.makeRequest<NeoBrowseResponse>('/neo/browse', {
       page: page.toString(),
@@ -125,16 +118,10 @@ class NasaApiService {
     });
   }
 
-  /**
-   * Get detailed information about a specific asteroid
-   */
   async getAsteroidDetails(asteroidId: string): Promise<AsteroidData> {
     return this.makeRequest<AsteroidData>(`/neo/${asteroidId}`);
   }
 
-  /**
-   * Get current approaching asteroids for the next week
-   */
   async getCurrentApproachingAsteroids(): Promise<AsteroidData[]> {
     const today = new Date();
     const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -145,13 +132,11 @@ class NasaApiService {
     try {
       const response = await this.getAsteroidFeed(startDate, endDate);
       
-      // Flatten the asteroid data from all dates
       const allAsteroids: AsteroidData[] = [];
       Object.values(response.near_earth_objects).forEach(dateAsteroids => {
         allAsteroids.push(...dateAsteroids);
       });
       
-      // Sort by approach date
       return allAsteroids.sort((a, b) => {
         const dateA = new Date(a.close_approach_data[0]?.close_approach_date_full || '');
         const dateB = new Date(b.close_approach_data[0]?.close_approach_date_full || '');
@@ -159,14 +144,10 @@ class NasaApiService {
       });
     } catch (error) {
       console.error('Failed to fetch current approaching asteroids:', error);
-      // Return mock data for demo purposes
       return this.getMockAsteroidData();
     }
   }
 
-  /**
-   * Mock data for development/demo purposes
-   */
   private getMockAsteroidData(): AsteroidData[] {
     return [
       {

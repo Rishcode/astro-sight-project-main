@@ -92,7 +92,7 @@ const Index = () => {
       <div className="absolute top-4 left-4 z-40 animate-fade-in-up">
         <div className="glass-panel p-4 rounded-lg">
           <h1 className="text-xl font-bold text-foreground">
-            🚀 NASA Asteroid Awareness
+            FOR NASA HACKATHON
           </h1>
           <p className="text-sm text-muted-foreground">
             Real-time Near-Earth Object monitoring
@@ -134,7 +134,7 @@ const Index = () => {
       <div className="absolute bottom-4 left-4 z-40">
         <div className="glass-panel p-3 rounded-lg">
           <p className="text-xs text-muted-foreground">
-            Data provided by NASA NeoWs API • Educational prototype
+            USING NASA NEO API
           </p>
         </div>
       </div>

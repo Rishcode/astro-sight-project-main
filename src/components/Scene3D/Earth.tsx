@@ -11,12 +11,13 @@ const Earth = () => {
   // In a real implementation, you'd load NASA's Blue Marble textures
   
   useFrame((state, delta) => {
-    if (earthRef.current) {
-      earthRef.current.rotation.y += delta * 0.1; // Slow Earth rotation
-    }
-    if (atmosphereRef.current) {
-      atmosphereRef.current.rotation.y += delta * 0.05; // Even slower atmosphere
-    }
+    // Earth rotation disabled for static view
+    // if (earthRef.current) {
+    //   earthRef.current.rotation.y += delta * 0.1; // Slow Earth rotation
+    // }
+    // if (atmosphereRef.current) {
+    //   atmosphereRef.current.rotation.y += delta * 0.05; // Even slower atmosphere
+    // }
   });
 
   // Create realistic Earth-like texture

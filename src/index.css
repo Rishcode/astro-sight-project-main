@@ -162,15 +162,7 @@
   }
 
   /* Starfield background */
-  .starfield {
-    background: 
-      radial-gradient(2px 2px at 20px 30px, hsla(var(--foreground) / 0.8), transparent),
-      radial-gradient(2px 2px at 40px 70px, hsla(var(--accent) / 0.6), transparent),
-      radial-gradient(1px 1px at 90px 40px, hsla(var(--foreground) / 0.9), transparent),
-      radial-gradient(1px 1px at 130px 80px, hsla(var(--primary) / 0.7), transparent),
-      radial-gradient(2px 2px at 160px 30px, hsla(var(--foreground) / 0.8), transparent),
-      linear-gradient(135deg, hsl(var(--space-gradient-start)), hsl(var(--space-gradient-end)));
-    background-repeat: repeat;
-    background-size: 200px 100px;
-  }
+    .starfield {
+      background: linear-gradient(135deg, hsl(var(--space-gradient-start)), hsl(var(--space-gradient-end)));
+    }
 }
