@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import Asteroid from './Asteroid';
 import { AsteroidData } from '../../services/nasaApi';
+import OrbitRing from './OrbitRing';
 
 interface AsteroidFieldProps {
   asteroids: AsteroidData[];
@@ -14,68 +15,98 @@ interface AsteroidFieldProps {
 const AsteroidField = ({ asteroids, onHover, onClick, hoveredAsteroid }: AsteroidFieldProps) => {
   const groupRef = useRef<THREE.Group>(null);
 
-  // Calculate positions for asteroids based on their distance data
-  const asteroidPositions = useMemo(() => {
-    return asteroids.map((asteroid, index) => {
+  // Orbital parameters for each asteroid
+  const orbits = useMemo(() => {
+    // Base orbital list with derived radii
+    const base = asteroids.map((asteroid, index) => {
       const approachData = asteroid.close_approach_data[0];
-      if (!approachData) {
-        // Fallback positioning
-        const angle = (index / asteroids.length) * Math.PI * 2;
-        const distance = 8 + Math.random() * 15;
-        return {
-          x: Math.cos(angle) * distance,
-          y: (Math.random() - 0.5) * 10,
-          z: Math.sin(angle) * distance,
-        };
+      let radius = 12 + Math.random() * 8; // fallback band
+      if (approachData) {
+        const auDistance = parseFloat(approachData.miss_distance.astronomical || '0.25');
+        radius = THREE.MathUtils.clamp(auDistance * 55, 7, 28);
       }
+      return { rawRadius: radius, asteroid, index };
+    });
 
-      // Convert astronomical units to scene units
-      const auDistance = parseFloat(approachData.miss_distance.astronomical);
-      const sceneDistance = Math.max(8, Math.min(25, auDistance * 50)); // Scale and clamp
-      
-      // Position based on time until approach
-      const approachDate = new Date(approachData.close_approach_date_full);
-      const now = new Date();
-      const timeDiff = approachDate.getTime() - now.getTime();
-      const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
-      
-      // Spread asteroids in a sphere around Earth
-      const phi = Math.acos(2 * Math.random() - 1); // Uniform distribution on sphere
-      const theta = 2 * Math.PI * Math.random();
-      
-      return {
-        x: sceneDistance * Math.sin(phi) * Math.cos(theta),
-        y: sceneDistance * Math.sin(phi) * Math.sin(theta),
-        z: sceneDistance * Math.cos(phi),
-        daysDiff,
-      };
+    // Sort by radius then enforce minimum spacing
+    base.sort((a,b) => a.rawRadius - b.rawRadius);
+    const minGap = 0.55;
+    let last = -Infinity;
+    base.forEach(b => {
+      if (b.rawRadius - last < minGap) b.rawRadius = last + minGap;
+      last = b.rawRadius;
+    });
+
+    // Shuffle back to original-ish order for motion variance
+    base.sort((a,b) => a.index - b.index);
+
+    return base.map(({ rawRadius, asteroid }, i) => {
+      const inclination = (Math.random() - 0.5) * 0.25; // lower tilt for cleaner look
+      const ascendingNode = Math.random() * Math.PI * 2;
+      const angle = Math.random() * Math.PI * 2;
+      const speed = (0.09 / rawRadius) * (0.6 + Math.random()*0.8);
+      const verticalJitter = (Math.random() - 0.5) * 0.4; // small Y offset for depth
+      return { radius: rawRadius, inclination, ascendingNode, angle, speed, verticalJitter, asteroid };
     });
   }, [asteroids]);
 
-  // Subtle rotation of the entire field
-  useFrame((state, delta) => {
-    if (groupRef.current) {
-      groupRef.current.rotation.y += delta * 0.02;
-    }
+  // Animated positions
+  const positionsRef = useRef<{ x: number; y: number; z: number; }[]>([]);
+  if (positionsRef.current.length !== asteroids.length) {
+    positionsRef.current = new Array(asteroids.length).fill(null).map(() => ({ x:0,y:0,z:0 }));
+  }
+
+  useFrame((_, delta) => {
+    orbits.forEach((o, i) => {
+      o.angle += o.speed * delta;
+      const x = o.radius * Math.cos(o.angle);
+      const z = o.radius * Math.sin(o.angle);
+      const vec = new THREE.Vector3(x, o.verticalJitter, z);
+      // Rotate by ascending node then inclination
+      vec.applyAxisAngle(new THREE.Vector3(0,1,0), o.ascendingNode);
+      vec.applyAxisAngle(new THREE.Vector3(1,0,0), o.inclination);
+      positionsRef.current[i].x = vec.x;
+      positionsRef.current[i].y = vec.y;
+      positionsRef.current[i].z = vec.z;
+    });
+    if (groupRef.current) groupRef.current.rotation.y += delta * 0.002; // very slow global drift
   });
 
   return (
     <group ref={groupRef}>
-      {asteroids.map((asteroid, index) => {
-        const position = asteroidPositions[index];
-        if (!position) return null;
-
+      {/* Orbit paths */}
+      {orbits.map((o, i) => {
+        // Only render orbit for: first 15, hazardous, or every 6th after that
+        const show = i < 15 || o.asteroid.is_potentially_hazardous_asteroid || i % 6 === 0;
+        if (!show) return null;
+        const hazardous = o.asteroid.is_potentially_hazardous_asteroid;
         return (
-          <Asteroid
-            key={asteroid.id}
-            asteroid={asteroid}
-            position={[position.x, position.y, position.z]}
-            onHover={onHover}
-            onClick={onClick}
-            isHovered={hoveredAsteroid?.id === asteroid.id}
+          <OrbitRing
+            key={`orbit-${i}`}
+            radius={o.radius}
+            inclination={o.inclination}
+            ascendingNode={o.ascendingNode}
+            opacity={hazardous ? 0.5 : 0.15}
+            color={hazardous ? '#ff7043' : '#404953'}
           />
         );
       })}
+
+      {/* Asteroids */}
+      {asteroids.map((asteroid, index) => (
+        <Asteroid
+          key={asteroid.id}
+          asteroid={asteroid}
+          position={[
+            positionsRef.current[index]?.x || 0,
+            positionsRef.current[index]?.y || 0,
+            positionsRef.current[index]?.z || 0
+          ]}
+          onHover={onHover}
+          onClick={onClick}
+          isHovered={hoveredAsteroid?.id === asteroid.id}
+        />
+      ))}
     </group>
   );
 };

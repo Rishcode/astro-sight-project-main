@@ -129,10 +129,10 @@ const InfoPanel = ({ asteroids, selectedAsteroid, onSimulateImpact, onClose }: I
       <Card className="glass-panel p-4">
         <h4 className="font-medium text-foreground mb-2">Controls</h4>
         <div className="text-xs text-muted-foreground space-y-1">
-          <p>🖱️ Drag to rotate view</p>
-          <p>🔍 Scroll to zoom</p>
-          <p>👆 Hover asteroids for info</p>
-          <p>🎯 Click asteroids for details</p>
+          <p> Drag to rotate view</p>
+          <p> Scroll to zoom in or zoom out</p>
+          <p> Hover asteroids for info</p>
+          <p> Click asteroids for details</p>
         </div>
       </Card>
     </div>

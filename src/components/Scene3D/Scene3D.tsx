@@ -5,6 +5,8 @@ import Earth from './Earth';
 import AsteroidField from './AsteroidField';
 import { Lighting } from './Lighting';
 import LoadingSpinner from '../UI/LoadingSpinner';
+import Sun from './Sun';
+import AsteroidBelt from './AsteroidBelt';
 
 interface Scene3DProps {
   asteroids: any[];
@@ -35,8 +37,9 @@ const Scene3D = ({
         }}
       >
         <Suspense fallback={null}>
-          {/* Lighting setup */}
+          {/* Central star (Sun) & lighting */}
           <Lighting />
+          <Sun />
           
           {/* Background stars */}
           <Stars 
@@ -51,6 +54,9 @@ const Scene3D = ({
           
           {/* Earth at center */}
           <Earth />
+
+          {/* Main asteroid belt background */}
+          <AsteroidBelt />
           
           {/* Asteroid field */}
           <AsteroidField 
